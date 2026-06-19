@@ -41,20 +41,26 @@ class SimpleMemoryStore implements Store {
 }
 
 class FailOpenRedisStore implements Store {
-  private redisStore: RedisStore
+  private redisStore: RedisStore | null = null
   private memoryStore: SimpleMemoryStore
   private windowMs: number
 
   constructor(windowMs: number) {
     this.windowMs = windowMs
     this.memoryStore = new SimpleMemoryStore(windowMs)
-    this.redisStore = new RedisStore({
-      sendCommand: async (...args: string[]) => {
-        const client = getRedis()
-        const reply = await client.call(args[0]!, ...args.slice(1))
-        return reply as unknown as RedisReply
-      },
-    })
+  }
+
+  private getRedisStore(): RedisStore {
+    if (!this.redisStore) {
+      this.redisStore = new RedisStore({
+        sendCommand: async (...args: string[]) => {
+          const client = getRedis()
+          const reply = await client.call(args[0]!, ...args.slice(1))
+          return reply as unknown as RedisReply
+        },
+      })
+    }
+    return this.redisStore
   }
 
   private isRedisAvailable(): boolean {
@@ -73,7 +79,7 @@ class FailOpenRedisStore implements Store {
     }
 
     try {
-      return await this.redisStore.increment(key)
+      return await this.getRedisStore().increment(key)
     } catch (err) {
       logger.warn({ err, key }, 'Redis rate limit increment failed. Falling back to memory store.')
       return this.memoryStore.increment(key)
@@ -86,7 +92,7 @@ class FailOpenRedisStore implements Store {
     }
 
     try {
-      await this.redisStore.decrement(key)
+      await this.getRedisStore().decrement(key)
     } catch (err) {
       logger.warn({ err, key }, 'Redis rate limit decrement failed. Falling back to memory store.')
       await this.memoryStore.decrement(key)
@@ -99,7 +105,7 @@ class FailOpenRedisStore implements Store {
     }
 
     try {
-      await this.redisStore.resetKey(key)
+      await this.getRedisStore().resetKey(key)
     } catch (err) {
       logger.warn({ err, key }, 'Redis rate limit resetKey failed. Falling back to memory store.')
       await this.memoryStore.resetKey(key)

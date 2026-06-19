@@ -36,6 +36,8 @@ services:
       - ./packages/api/src:/app/src
     environment:
       - NODE_ENV=development
+      - MONGODB_URI=mongodb://mongo:27017/causalfunnel
+      - REDIS_URL=redis://redis:6379
     env_file:
       - .env
     depends_on:

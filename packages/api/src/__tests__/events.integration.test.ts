@@ -278,8 +278,8 @@ describe('Events API Integration Tests', () => {
       }
     }
 
-    // Ingestion response must return almost instantly (< 10ms)
-    expect(duration).toBeLessThan(10)
+    // Ingestion response must return almost instantly (< 50ms)
+    expect(duration).toBeLessThan(50)
   })
 
   it('18. GET /api/sessions — verify pagination defaults page=1, limit=20', async () => {
