@@ -97,7 +97,8 @@ describe('API Security Headers & CORS Tests', () => {
       })
       .expect(202)
 
-    expect(response.headers['access-control-allow-origin']).toBe('*')
+    expect(response.headers['access-control-allow-origin']).toBe('https://thirdparty.com')
+    expect(response.headers['access-control-allow-credentials']).toBe('true')
   })
 
   it('5. Should enforce restricted CORS on GET /api/sessions and only accept from NEXT_PUBLIC_API_URL', async () => {
@@ -125,7 +126,8 @@ describe('API Security Headers & CORS Tests', () => {
       .set('Access-Control-Request-Method', 'POST')
       .expect(200)
 
-    expect(response.headers['access-control-allow-origin']).toBe('*')
+    expect(response.headers['access-control-allow-origin']).toBe('https://anydomain.com')
+    expect(response.headers['access-control-allow-credentials']).toBe('true')
     expect(response.headers['access-control-allow-methods']).toContain('POST')
     expect(response.headers['access-control-max-age']).toBe('86400')
   })
