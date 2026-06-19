@@ -37,8 +37,7 @@ if (isTest) {
       getNodeAutoInstrumentations({
         '@opentelemetry/instrumentation-http'    : { enabled: true },
         '@opentelemetry/instrumentation-express' : { enabled: true },
-        '@opentelemetry/instrumentation-mongodb' : { enabled: true,
-          dbStatementSerializer: (command: unknown) => JSON.stringify(command).slice(0, 200) },
+        '@opentelemetry/instrumentation-mongodb' : { enabled: false },
         '@opentelemetry/instrumentation-ioredis' : { enabled: true },
         '@opentelemetry/instrumentation-fs'      : { enabled: false }, // too noisy
       }),
