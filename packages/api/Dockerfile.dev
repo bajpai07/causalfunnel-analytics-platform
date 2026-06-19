@@ -1,0 +1,6 @@
+FROM node:20-alpine
+RUN npm install -g pnpm tsx
+WORKDIR /app
+COPY package.json ./
+RUN pnpm install
+CMD ["tsx", "watch", "src/index.ts"]

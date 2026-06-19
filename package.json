@@ -1,0 +1,24 @@
+{
+  "name": "causalfunnel-monorepo",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"pnpm --filter api dev\" \"pnpm --filter dashboard dev\"",
+    "build": "pnpm --filter tracker build && pnpm --filter api build && pnpm --filter dashboard build",
+    "lint": "eslint \"packages/**/*.{ts,tsx,js,jsx}\" --max-warnings 0",
+    "typecheck": "pnpm -r exec tsc --noEmit",
+    "test": "vitest run",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.2",
+    "@typescript-eslint/eslint-plugin": "^7.13.0",
+    "@typescript-eslint/parser": "^7.13.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.0",
+    "husky": "^9.0.11",
+    "prettier": "^3.3.2",
+    "typescript": "^5.4.5",
+    "vitest": "^1.6.0"
+  }
+}

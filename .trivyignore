@@ -1,0 +1,5 @@
+# CausalFunnel Trivy Ignore File
+# Document reason for each ignored CVE
+
+# Add known false-positives here as they are identified:
+# CVE-XXXX-XXXXX  # reason: not applicable because ...

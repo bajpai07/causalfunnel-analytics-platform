@@ -1,0 +1,13 @@
+{
+  "name": "tracker",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --minify --target=es2017 --outfile=../../packages/dashboard/public/tracker.js --format=iife --global-name=CausalFunnelTracker",
+    "size-check": "gzip -c ../../packages/dashboard/public/tracker.js | wc -c | awk '{if($1>5120) exit 1}'",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "esbuild": "^0.21.5"
+  }
+}

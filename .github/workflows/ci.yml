@@ -1,0 +1,225 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop, 'feature/**']
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+
+  # ─── JOB 1: Code Quality ──────────────────────────────
+  quality:
+    name: Type Check & Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: '${{ env.PNPM_VERSION }}'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - name: Check for console.log in source
+        run: |
+          if grep -r "console\.log" packages/*/src --include="*.ts" --include="*.tsx"; then
+            echo "ERROR: console.log found in source. Use pino logger."
+            exit 1
+          fi
+
+  # ─── JOB 2: Test Suite ────────────────────────────────
+  test:
+    name: Integration & Security Tests
+    runs-on: ubuntu-latest
+    needs: quality
+
+    services:
+      mongodb:
+        image: mongo:7.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand({ping:1})' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      NODE_ENV: test
+      MONGODB_URI: mongodb://localhost:27017/causalfunnel_test
+      REDIS_URL: redis://localhost:6379
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: '${{ env.PNPM_VERSION }}'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test --run
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: packages/api/coverage/
+
+  # ─── JOB 3: Build & Bundle ────────────────────────────
+  build:
+    name: Build All Packages
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: '${{ env.PNPM_VERSION }}'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build tracker bundle
+        run: pnpm --filter tracker build
+
+      - name: Assert tracker < 5KB gzipped
+        run: |
+          SIZE=$(gzip -c packages/dashboard/public/tracker.js | wc -c)
+          echo "Tracker gzipped size: ${SIZE} bytes"
+          if [ "$SIZE" -gt 5120 ]; then
+            echo "FAIL: tracker.js exceeds 5KB gzip limit (${SIZE} bytes)"
+            exit 1
+          fi
+          echo "PASS: tracker.js is ${SIZE} bytes gzipped"
+
+      - name: Build API
+        run: pnpm --filter api build
+        env:
+          NODE_ENV: production
+
+      - name: Build Dashboard
+        run: pnpm --filter dashboard build
+        env:
+          NODE_ENV: production
+          NEXT_PUBLIC_API_URL: http://localhost:3001
+
+      - name: Build Docker image (smoke test)
+        run: docker build -t causalfunnel-api:ci packages/api
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            packages/api/dist/
+            packages/dashboard/.next/
+            packages/dashboard/public/tracker.js
+          retention-days: 7
+
+  # ─── JOB 4: Security Scan ─────────────────────────────
+  security:
+    name: Vulnerability Scan
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with:
+          version: '${{ env.PNPM_VERSION }}'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '${{ env.NODE_VERSION }}'
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+
+      - name: npm audit (high severity)
+        run: pnpm audit --audit-level=high
+        continue-on-error: true   # warn but don't block on first setup
+
+      - name: Trivy filesystem scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'           # warn only for now
+          format: 'table'
+
+      - name: Build Docker image for Trivy
+        run: docker build -t causalfunnel-api:scan packages/api
+
+      - name: Trivy Docker image scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'causalfunnel-api:scan'
+          severity: 'CRITICAL'
+          exit-code: '1'           # fail on CRITICAL CVEs in image
+
+  # ─── JOB 5: Deploy (main branch only) ─────────────────
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, build, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts
+
+      - name: Deploy API to Render
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK_API }}" \
+            -H "Content-Type: application/json" \
+            --fail --silent --show-error
+        env:
+          RENDER_DEPLOY_HOOK_API: ${{ secrets.RENDER_DEPLOY_HOOK_API }}
+
+      - name: Deploy Dashboard to Vercel
+        run: |
+          npx vercel --prod --token "${{ secrets.VERCEL_TOKEN }}" \
+            --cwd packages/dashboard
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Smoke test staging
+        run: |
+          sleep 30  # wait for deploy to propagate
+          STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.STAGING_API_URL }}/health")
+          if [ "$STATUS" != "200" ]; then
+            echo "Staging health check failed with status $STATUS"
+            exit 1
+          fi
+          echo "Staging health check passed"

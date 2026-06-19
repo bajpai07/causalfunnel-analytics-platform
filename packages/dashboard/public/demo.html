@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CausalSound Pro - Premium Headphones Store</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0b10;
+      --bg-secondary: #12131a;
+      --bg-card: #1c1d26;
+      --border: rgba(255, 255, 255, 0.08);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: rgba(18, 19, 26, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
+    }
+
+    .nav-brand {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #a5b4fc 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.03em;
+      cursor: pointer;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--text-primary);
+    }
+
+    .status-banner {
+      background-color: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border-bottom: 1px solid rgba(239, 68, 68, 0.25);
+      text-align: center;
+      padding: 8px 24px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      transition: all 0.3s ease;
+    }
+
+    .status-banner.active {
+      background-color: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border-bottom: 1px solid rgba(16, 185, 129, 0.25);
+    }
+
+    .main-layout {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 24px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 60px;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 48px;
+    }
+
+    @media (max-width: 900px) {
+      .product-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+    }
+
+    .gallery-container {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      min-height: 400px;
+    }
+
+    .gallery-glow {
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0) 70%);
+      pointer-events: none;
+    }
+
+    /* Headphone CSS Art representation */
+    .headphone-art {
+      width: 200px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    .headphone-band {
+      position: absolute;
+      top: 0;
+      width: 180px;
+      height: 180px;
+      border: 16px solid var(--accent);
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-45deg);
+    }
+
+    .headphone-band-cushion {
+      position: absolute;
+      top: 2px;
+      width: 150px;
+      height: 150px;
+      border: 8px solid #312e81;
+      border-bottom-color: transparent;
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-radius: 50%;
+      transform: rotate(-45deg);
+    }
+
+    .headphone-earcup {
+      position: absolute;
+      width: 44px;
+      height: 80px;
+      background-color: #2e3047;
+      border: 4px solid var(--accent);
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      bottom: 20px;
+    }
+
+    .headphone-earcup.left {
+      left: 0;
+      transform: rotate(5deg);
+    }
+
+    .headphone-earcup.right {
+      right: 0;
+      transform: rotate(-5deg);
+    }
+
+    .gallery-thumbnails {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .thumbnail {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-card);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .thumbnail:hover, .thumbnail.active {
+      border-color: var(--accent);
+      transform: scale(1.05);
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .product-tag {
+      background-color: rgba(99, 102, 241, 0.1);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.2);
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      align-self: flex-start;
+      margin-bottom: 16px;
+    }
+
+    .product-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .rating-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .stars {
+      color: var(--warning);
+      font-size: 1.1rem;
+    }
+
+    .review-count {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+    }
+
+    .product-price {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .price-discounted {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      text-decoration: line-through;
+      font-weight: 400;
+    }
+
+    .product-description {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 32px;
+    }
+
+    .options-group {
+      margin-bottom: 32px;
+    }
+
+    .options-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      color: var(--text-secondary);
+    }
+
+    .color-swatches {
+      display: flex;
+      gap: 12px;
+    }
+
+    .color-swatch {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .color-swatch:hover, .color-swatch.active {
+      border-color: var(--text-primary);
+      transform: scale(1.1);
+    }
+
+    .color-swatch.black { background-color: #111317; }
+    .color-swatch.silver { background-color: #cbd5e1; }
+    .color-swatch.blue { background-color: #1e3a8a; }
+
+    .action-buttons {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    button {
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-cart {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      flex: 1;
+    }
+
+    .btn-cart:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-specs {
+      background-color: var(--bg-card);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-specs:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: var(--text-secondary);
+    }
+
+    /* Tabs Section */
+    .tabs-section {
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+
+    .tabs-header {
+      display: flex;
+      gap: 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 24px;
+    }
+
+    .tab-trigger {
+      padding: 12px 4px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.95rem;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .tab-trigger.active {
+      color: var(--text-primary);
+    }
+
+    .tab-trigger.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .specs-table tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .specs-table td {
+      padding: 12px 0;
+    }
+
+    .specs-table td.label {
+      font-weight: 600;
+      color: var(--text-primary);
+      width: 150px;
+    }
+
+    /* Related Products */
+    .related-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .related-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+    }
+
+    .related-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.2s ease;
+    }
+
+    .related-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .related-card-title {
+      font-weight: 600;
+      font-size: 1.05rem;
+    }
+
+    .related-card-price {
+      font-weight: 700;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .btn-quick-add {
+      background-color: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      width: 100%;
+    }
+
+    .btn-quick-add:hover {
+      background-color: var(--accent);
+      border-color: var(--accent);
+      color: white;
+    }
+
+    /* Newsletter section */
+    .newsletter-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .newsletter-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    .newsletter-desc {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      max-width: 480px;
+    }
+
+    .newsletter-form {
+      display: flex;
+      gap: 12px;
+      max-width: 500px;
+      width: 100%;
+    }
+
+    .newsletter-input {
+      flex: 1;
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .btn-subscribe {
+      background-color: var(--accent);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+    }
+
+    .btn-subscribe:hover {
+      background-color: var(--accent-hover);
+    }
+
+    /* Interactive toast notifier */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background-color: var(--bg-card);
+      border: 1px solid var(--accent);
+      color: var(--text-primary);
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      transform: translateY(150%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+
+    .toast-icon {
+      color: var(--success);
+      font-size: 1.2rem;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 40px 24px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      background-color: var(--bg-secondary);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="status" class="status-banner">Connecting CausalFunnel Tracker...</div>
+
+  <header>
+    <div class="nav-container">
+      <div class="nav-brand" id="nav-home">CausalSound</div>
+      <ul class="nav-links">
+        <li><a href="#overview" id="lnk-overview">Overview</a></li>
+        <li><a href="#specs" id="lnk-specs">Specifications</a></li>
+        <li><a href="#accessories" id="lnk-accessories">Accessories</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <div class="main-layout">
+    <!-- Product Presentation -->
+    <div class="product-grid" id="overview">
+      <!-- Gallery Column -->
+      <div class="gallery-container">
+        <div class="gallery-glow"></div>
+        <div class="headphone-art">
+          <div class="headphone-band"></div>
+          <div class="headphone-band-cushion"></div>
+          <div class="headphone-earcup left"></div>
+          <div class="headphone-earcup right"></div>
+        </div>
+        <div class="gallery-thumbnails">
+          <div class="thumbnail active" id="thumb-obsidian">Black</div>
+          <div class="thumbnail" id="thumb-blue">Blue</div>
+          <div class="thumbnail" id="thumb-silver">Silver</div>
+        </div>
+      </div>
+
+      <!-- Details Column -->
+      <div class="product-details">
+        <span class="product-tag">Flagship Product</span>
+        <h1 class="product-title">CausalSound Pro ANC</h1>
+        <div class="rating-container">
+          <span class="stars">★★★★★</span>
+          <span class="review-count">(124 customer reviews)</span>
+        </div>
+        <div class="product-price">
+          $299.99
+          <span class="price-discounted">$349.99</span>
+        </div>
+        <p class="product-description">
+          Engineered with precision dynamic drivers and advanced hybrid Active Noise Cancelling, CausalSound Pro delivers crisp acoustic audio fidelity while blocking external noise. With up to 40 hours of battery life and ergonomic memory foam cushions.
+        </p>
+
+        <div class="options-group">
+          <div class="options-title">Select Colorway</div>
+          <div class="color-swatches">
+            <div class="color-swatch black active" title="Obsidian Black" id="swatch-black"></div>
+            <div class="color-swatch blue" title="Midnight Blue" id="swatch-blue"></div>
+            <div class="color-swatch silver" title="Ice Silver" id="swatch-silver"></div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="btn-cart" id="btn-cart">
+            🛒 Add to Cart
+          </button>
+          <button class="btn-specs" id="btn-specs-trigger">
+            Specs Info
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Details Accordion -->
+    <div class="tabs-section" id="specs">
+      <div class="tabs-header">
+        <button class="tab-trigger active" id="tab-specs">Technical Specs</button>
+        <button class="tab-trigger" id="tab-features">Key Features</button>
+      </div>
+
+      <div class="tab-content active" id="content-specs">
+        <table class="specs-table">
+          <tr>
+            <td class="label">Driver Type</td>
+            <td>40mm Dynamic Neodymium Drivers</td>
+          </tr>
+          <tr>
+            <td class="label">Frequency Range</td>
+            <td>10Hz - 40kHz (Hi-Res Audio Certified)</td>
+          </tr>
+          <tr>
+            <td class="label">Active Noise Cancelling</td>
+            <td>Hybrid ANC (4 micro-phones array)</td>
+          </tr>
+          <tr>
+            <td class="label">Battery Life</td>
+            <td>40 Hours (ANC On) / 50 Hours (ANC Off)</td>
+          </tr>
+          <tr>
+            <td class="label">Connectivity</td>
+            <td>Bluetooth 5.2 & 3.5mm Wired Audio Jack</td>
+          </tr>
+        </table>
+      </div>
+
+      <div class="tab-content" id="content-features">
+        <p style="margin-bottom: 12px;"><strong>Hybrid ANC Technology:</strong> Dual-microphones capture ambient noise, generating anti-noise phases to block external sounds up to 35dB.</p>
+        <p style="margin-bottom: 12px;"><strong>Premium Cushion Ergonomics:</strong> Ultra-soft memory foam wrap cushions disperse pressure, forming an ideal acoustic seal for long sessions.</p>
+        <p><strong>CausalSync Instant Pairing:</strong> Auto-connects to your active bluetooth device as soon as you power them on.</p>
+      </div>
+    </div>
+
+    <!-- Related Accessories -->
+    <div class="related-section" id="accessories">
+      <h2 class="related-title">Complete Your Set</h2>
+      <div class="related-grid">
+        <!-- Stand Card -->
+        <div class="related-card">
+          <div style="font-size: 2.5rem; text-align: center;">🗼</div>
+          <div class="related-card-title">Acoustic Stand</div>
+          <div class="related-card-price">$49.99</div>
+          <button class="btn-quick-add" id="btn-add-stand">Quick Add</button>
+        </div>
+        <!-- Travel Case -->
+        <div class="related-card">
+          <div style="font-size: 2.5rem; text-align: center;">🎒</div>
+          <div class="related-card-title">EVA Hardshell Case</div>
+          <div class="related-card-price">$29.99</div>
+          <button class="btn-quick-add" id="btn-add-case">Quick Add</button>
+        </div>
+        <!-- Cable -->
+        <div class="related-card">
+          <div style="font-size: 2.5rem; text-align: center;">🔌</div>
+          <div class="related-card-title">Gold-Plated Aux Cable</div>
+          <div class="related-card-price">$14.99</div>
+          <button class="btn-quick-add" id="btn-add-cable">Quick Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Newsletter -->
+    <div class="newsletter-card">
+      <h2 class="newsletter-title">Join the Sound Club</h2>
+      <p class="newsletter-desc">Subscribe to stay updated with product launches, acoustic firmware upgrades, and limited promotional discounts.</p>
+      <form class="newsletter-form" id="newsletter-form" onsubmit="event.preventDefault();">
+        <input type="email" class="newsletter-input" placeholder="Enter your email address" required id="newsletter-email">
+        <button type="submit" class="btn-subscribe" id="btn-subscribe">Subscribe</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2026 CausalSound Labs. All rights reserved. Powered by CausalFunnel Analytics.</p>
+  </footer>
+
+  <!-- Dynamic Toast Element -->
+  <div class="toast" id="toast">
+    <span class="toast-icon">✓</span>
+    <span id="toast-message">Item successfully added to cart.</span>
+  </div>
+
+  <!-- Configure endpoint target before loading the script -->
+  <script>
+    window.__CF_API_URL__ = 'http://localhost:3001/api/events';
+  </script>
+
+  <!-- Load the compiled tracker relatively -->
+  <script src="tracker.js"></script>
+
+  <!-- Interaction Logic and Status indicator checks -->
+  <script>
+    // Status Indicator
+    function checkTrackerStatus() {
+      const statusDiv = document.getElementById('status');
+      if (window.CausalFunnelTracker) {
+        statusDiv.textContent = '⚡ CausalFunnel Tracking Active ✓';
+        statusDiv.className = 'status-banner active';
+      } else {
+        setTimeout(checkTrackerStatus, 100);
+      }
+    }
+    checkTrackerStatus();
+
+    // Toast Helper
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    function showToast(message) {
+      toastMsg.textContent = message;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Color swatches selection
+    const swatches = document.querySelectorAll('.color-swatch');
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    swatches.forEach(sw => {
+      sw.addEventListener('click', () => {
+        swatches.forEach(s => s.classList.remove('active'));
+        sw.classList.add('active');
+        showToast(`Colorway changed to ${sw.title}`);
+      });
+    });
+
+    // Thumbnails interaction
+    thumbnails.forEach(th => {
+      th.addEventListener('click', () => {
+        thumbnails.forEach(t => t.classList.remove('active'));
+        th.classList.add('active');
+        showToast(`Viewing ${th.textContent} product variant`);
+      });
+    });
+
+    // Add to Cart
+    document.getElementById('btn-cart').addEventListener('click', () => {
+      showToast('Added CausalSound Pro ANC to your cart!');
+    });
+
+    // Specs trigger
+    document.getElementById('btn-specs-trigger').addEventListener('click', () => {
+      document.getElementById('specs').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // Accordion Tab Switches
+    const tabSpecs = document.getElementById('tab-specs');
+    const tabFeatures = document.getElementById('tab-features');
+    const contentSpecs = document.getElementById('content-specs');
+    const contentFeatures = document.getElementById('content-features');
+
+    tabSpecs.addEventListener('click', () => {
+      tabSpecs.classList.add('active');
+      tabFeatures.classList.remove('active');
+      contentSpecs.classList.add('active');
+      contentFeatures.classList.remove('active');
+    });
+
+    tabFeatures.addEventListener('click', () => {
+      tabFeatures.classList.add('active');
+      tabSpecs.classList.remove('active');
+      contentFeatures.classList.add('active');
+      contentSpecs.classList.remove('active');
+    });
+
+    // Quick add accessory items
+    document.getElementById('btn-add-stand').addEventListener('click', () => {
+      showToast('Acoustic Stand added to cart!');
+    });
+    document.getElementById('btn-add-case').addEventListener('click', () => {
+      showToast('EVA Hardshell Case added to cart!');
+    });
+    document.getElementById('btn-add-cable').addEventListener('click', () => {
+      showToast('Gold-Plated Aux Cable added to cart!');
+    });
+
+    // Newsletter submit
+    document.getElementById('newsletter-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const emailVal = document.getElementById('newsletter-email').value;
+      if (emailVal) {
+        showToast(`Subscribed ${emailVal} to Sound Club newsletters!`);
+        document.getElementById('newsletter-email').value = '';
+      }
+    });
+  </script>
+</body>
+</html>
