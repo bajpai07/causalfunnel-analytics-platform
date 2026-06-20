@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Map, RefreshCw } from 'lucide-react'
 import { HeatmapCanvas } from './HeatmapCanvas'
-import type { HeatmapPoint } from '../../lib/api'
+import { fetchHeatmap, type HeatmapPoint } from '../../lib/api'
 
 export default function HeatmapPage() {
   const [inputUrl, setInputUrl] = useState('')
@@ -21,12 +21,8 @@ export default function HeatmapPage() {
     setIsLoading(true)
     setError(null)
     try {
-      const res = await fetch(`/api/heatmap?url=${encodeURIComponent(targetUrl)}`)
-      if (!res.ok) {
-        throw new Error(`Server returned status ${res.status}`)
-      }
-      const payload = await res.json()
-      setHeatmapData(payload.data)
+      const data = await fetchHeatmap(targetUrl)
+      setHeatmapData(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch heatmap data')
       setHeatmapData([])
