@@ -89,10 +89,6 @@ Built as a resilient, observable, and scalable analytics system using a modern T
 
 https://causalfunnel-analytics-platform-das.vercel.app
 
-### API
-
-https://causalfunnel-analytics-platform.onrender.com
-
 ### Health Check
 
 https://causalfunnel-analytics-platform.onrender.com/health
