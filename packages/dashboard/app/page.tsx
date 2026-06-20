@@ -1,7 +1,14 @@
 import Link from 'next/link'
 import { Users, Flame, Code } from 'lucide-react'
+import { headers } from 'next/headers'
 
 export default function HomePage() {
+  const headersList = headers()
+  const host = headersList.get('host') || 'localhost:3000'
+  const protocol = host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https'
+  const dashboardUrl = `${protocol}://${host}`
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'
+
   return (
     <div className="home-container" style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
       {/* Hero Section */}
@@ -141,9 +148,9 @@ export default function HomePage() {
             }}
           >
             {`<script>
-  window.__CF_API_URL__ = 'http://localhost:3001/api/events';
+  window.__CF_API_URL__ = '${apiUrl}/api/events';
 </script>
-<script src="http://localhost:3000/tracker.js" defer></script>`}
+<script src="${dashboardUrl}/tracker.js" defer></script>`}
           </pre>
         </div>
       </section>

@@ -29,10 +29,10 @@ export interface ApiResponse<T> {
   meta?: { page: number; limit: number; total: number }
 }
 
-const isServer = typeof window === 'undefined'
-const BASE = isServer
-  ? (process.env.INTERNAL_API_URL ?? 'http://api:3001')
-  : (process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001')
+const BASE =
+  process.env.INTERNAL_API_URL ||
+  process.env.NEXT_PUBLIC_API_URL ||
+  'http://localhost:3001'
 
 export async function fetchSessions(
   page = 1,
