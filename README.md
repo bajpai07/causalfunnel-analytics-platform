@@ -1,6 +1,6 @@
 #  CausalFunnel Analytics
 
-> Production-grade user behavior analytics platform for tracking visitor journeys, session timelines, event streams, and click heatmaps in real time.
+>  Full-stack analytics platform for session tracking, event ingestion, and click heatmap visualization.
 
 Built as a resilient, observable, and scalable analytics system using a modern TypeScript monorepo architecture.
 
@@ -378,23 +378,7 @@ Scenarios:
 * Process restarts
 * Rate limit saturation
 
----
 
-# 📸 Screenshots
-
-### Dashboard
-
-Add dashboard screenshot here.
-
-### Sessions Explorer
-
-Add sessions screenshot here.
-
-### Heatmap View
-
-Add heatmap screenshot here.
-
----
 
 # 👨‍💻 Author
 
@@ -402,10 +386,5 @@ Add heatmap screenshot here.
 
 GitHub: https://github.com/bajpai07
 
-LinkedIn: https://linkedin.com/in/your-profile
+LinkedIn: https://www.linkedin.com/in/abhishekbajpai07
 
----
-
-## License
-
-MIT License
