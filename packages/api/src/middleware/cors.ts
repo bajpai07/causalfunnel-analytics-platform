@@ -5,6 +5,7 @@ import { config } from '../config.js'
 const ALLOWED_ORIGINS = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
+  'https://causalfunnel-analytics-platform-das.vercel.app',
 ]
 
 export const openCors = cors({
